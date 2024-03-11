@@ -24,7 +24,27 @@
                         </li>
                         @await Component.InvokeAsync("MenuDepartamentos")
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Paginacion" asp-action="PaginarRegistroVistaDepartamento">Privacy</a>
+                        </li>
+                        
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Paginacion
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Paginacion" 
+                                    asp-action="PaginarRegistroVistaDepartamento">
+                                    Paginacion Registro vista</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Paginacion"
+                                       asp-action="PaginarGrupo">
+                                        Paginacion grupo
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

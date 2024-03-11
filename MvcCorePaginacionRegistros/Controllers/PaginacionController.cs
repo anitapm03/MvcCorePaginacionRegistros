@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MvcCorePaginacionRegistros.Models;
 using MvcCorePaginacionRegistros.Repositories;
 
 namespace MvcCorePaginacionRegistros.Controllers
@@ -12,6 +13,26 @@ namespace MvcCorePaginacionRegistros.Controllers
             this.repo = repo;
         }
 
+
+        public async Task<IActionResult>
+            PaginarGrupo(int? posicion)
+        {
+            if(posicion == null)
+            {
+                posicion = 1;
+            }
+            
+            int numeroRegistros = await
+                this.repo.GetNumeroRegistrosVistaDepartamentos();
+
+            ViewData["REGISTROS"] = numeroRegistros;
+
+            List<VistaDepartamento> departamentos = await
+                this.repo.GetGrupoVistaDepartamentoAsync(posicion.Value);
+
+            return View(departamentos);
+        }
+
         public async Task<IActionResult>
             PaginarRegistroVistaDepartamento(int? posicion)
         {
@@ -20,14 +41,31 @@ namespace MvcCorePaginacionRegistros.Controllers
                 //ponemos la posicion en el primer registro
                 posicion = 1;
             }
-            else
-            {
-
-            }
+            
             int numeroRegistros = await
                 this.repo.GetNumeroRegistrosVistaDepartamentos();
+            int siguiente = posicion.Value + 1;
 
-            return View();
+            if(siguiente > numeroRegistros)
+            {
+                //efecto optico 
+                siguiente = numeroRegistros;
+            }
+            int anterior = posicion.Value - 1;
+
+            if (anterior < 1)
+            {
+                anterior = 1;
+            }
+
+            VistaDepartamento vista = await 
+                this.repo.GetVistaDepartamentoAsync(posicion.Value);
+
+            ViewData["ULTIMO"] = numeroRegistros;
+            ViewData["SIGUIENTE"] = siguiente;
+            ViewData["ANTERIOR"] = anterior; ;
+
+            return View(vista);
         }
     }
 }

@@ -17,4 +17,13 @@ namespace MvcCorePaginacionRegistros.Models
         public int Posicion { get; set; }
     }
 }
-
+/*
+CREATE VIEW V_DEPARTAMENTOS_INDIVIDUAL
+AS
+	SELECT CAST(
+	ROW_NUMBER() OVER (ORDER BY DEPT_NO) AS INT)
+	AS POSICION,
+	ISNULL(DEPT_NO, 0) AS DEPT_NO, DNOMBRE, LOC 
+	FROM DEPT
+GO
+ */
