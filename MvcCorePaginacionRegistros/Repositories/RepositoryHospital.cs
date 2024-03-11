@@ -1,7 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Humanizer;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using MvcCorePaginacionRegistros.Data;
 using MvcCorePaginacionRegistros.Models;
+/*CREATE PROCEDURE SP_GRUPO_DEPTOS
+(@POSICION INT)
+AS
+    SELECT DEPT_NO, DNOMBRE, LOC 
+	FROM V_DEPARTAMENTOS_INDIVIDUAL
+	WHERE POSICION >= @POSICION AND
+	POSICION < (@POSICION +2)
+GO
 
+ CREATE PROCEDURE SP_GRUPO_EMP
+(@POSICION INT)
+AS
+	SELECT EMP_NO, APELLIDO, OFICIO,
+	SALARIO, DEPT_NO
+	FROM V_EMP_INDIVIDUAL
+	WHERE POSICION >= @POSICION AND
+	POSICION < (@POSICION + 3)
+GO
+ */
 namespace MvcCorePaginacionRegistros.Repositories
 {
     public class RepositoryHospital
@@ -12,6 +33,33 @@ namespace MvcCorePaginacionRegistros.Repositories
         public RepositoryHospital(HospitalContext context)
         {
             this.context = context;
+        }
+
+        public async Task<List<Empleado>>
+            GetGrupoEmp(int posicion)
+        {
+            string sql = "SP_GRUPO_EMP @POSICION";
+            SqlParameter ppos = new SqlParameter("POSICION", posicion);
+            var consulta =
+                this.context.Empleados.FromSqlRaw(sql, ppos);
+            return await consulta.ToListAsync();
+        }
+
+
+        public async Task<List<Departamento>>
+            GetGrupoDept(int posicion)
+        {
+            string sql = "SP_GRUPO_DEPTOS @POSICION";
+            SqlParameter ppos = new SqlParameter("POSICION", posicion);
+            var consulta =
+                this.context.Departamentos.FromSqlRaw(sql, ppos);
+            return await consulta.ToListAsync();
+        }
+
+        public async Task<int> GetNumeroRegistrosVistaEmpleados()
+        {
+            return await
+                this.context.VistaEmpleados.CountAsync();
         }
 
         public async Task<int> GetNumeroRegistrosVistaDepartamentos()

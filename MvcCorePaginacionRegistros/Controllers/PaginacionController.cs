@@ -13,6 +13,44 @@ namespace MvcCorePaginacionRegistros.Controllers
             this.repo = repo;
         }
 
+        public async Task<IActionResult>
+           PaginarGrupoEmp(int? posicion)
+        {
+            if (posicion == null)
+            {
+                posicion = 1;
+            }
+
+            int numeroRegistros = await
+                this.repo.GetNumeroRegistrosVistaEmpleados();
+
+            ViewData["REGISTROS"] = numeroRegistros;
+
+            List<Empleado> empleados = await
+                this.repo.GetGrupoEmp(posicion.Value);
+
+            return View(empleados);
+        }
+
+        public async Task<IActionResult>
+           PaginarGrupoDept(int? posicion)
+        {
+            if (posicion == null)
+            {
+                posicion = 1;
+            }
+
+            int numeroRegistros = await
+                this.repo.GetNumeroRegistrosVistaDepartamentos();
+
+            ViewData["REGISTROS"] = numeroRegistros;
+
+            List<Departamento> departamentos = await
+                this.repo.GetGrupoDept(posicion.Value);
+
+            return View(departamentos);
+        }
+
 
         public async Task<IActionResult>
             PaginarGrupo(int? posicion)
