@@ -1,0 +1,14 @@
+﻿@model List<Departamento>
+
+<ul>
+    @foreach (Departamento d in Model)
+    {
+        <li>
+            <a asp-controller="Departamentos"
+            asp-action="Detalles"
+            asp-route-id="@d.IdDepartamento">
+            @d.Nombre</a>
+        </li>
+    }
+    
+</ul>

@@ -1,0 +1,28 @@
+﻿@model List<Empleado>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>APELLIDO</th>
+            <th>OFICIO</th>
+            <th>SALARIO</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Apellido)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Oficio)
+                </td>
+                <td>
+                    <img src="@item.Salario" style="width: 100px; height: 100px" />
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

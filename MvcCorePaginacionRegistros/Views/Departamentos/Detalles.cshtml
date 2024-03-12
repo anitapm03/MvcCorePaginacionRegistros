@@ -1,0 +1,57 @@
+﻿@model ModelDeptEmp
+
+<h1>@Model.departamento.Nombre, @Model.departamento.IdDepartamento</h1>
+<h2>@Model.departamento.Localidad</h2>
+
+
+<h2>Registro @ViewData["POSICION"] de @ViewData["ULTIMO"]</h2>
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <a asp-controller="Departamentos"
+               asp-action="Detalles"
+               asp-route-posicion="1"
+               asp-route-id="@ViewData["DEPARTAMENTO"]">
+                Primero
+            </a>
+        </li>
+
+        <li class="list-group-item">
+            <a asp-controller="Departamentos"
+               asp-action="Detalles"
+               asp-route-posicion="@ViewData["SIGUIENTE"]"
+               asp-route-id="@ViewData["DEPARTAMENTO"]">
+                Siguiente
+            </a>
+        </li>
+
+        <li class="list-group-item">
+            <a asp-controller="Departamentos"
+               asp-action="Detalles"
+               asp-route-posicion="@ViewData["ULTIMO"]"
+               asp-route-id="@ViewData["DEPARTAMENTO"]">
+                Ultimo
+            </a>
+        </li>
+    </ul>
+</div>
+
+<ul>
+    <li>@Model.Empleado.Apellido</li>
+    <li>@Model.Empleado.Salario</li>
+</ul>
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            
+            $("#container").load("/Departamentos/_EmpleadosPartial");
+            
+        })
+    </script>
+}
+
+<div id="container"></div>

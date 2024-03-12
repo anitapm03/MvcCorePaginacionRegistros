@@ -2,9 +2,11 @@
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using MvcCorePaginacionRegistros.Controllers;
 using MvcCorePaginacionRegistros.Data;
 using MvcCorePaginacionRegistros.Models;
 using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 /*CREATE PROCEDURE SP_GRUPO_DEPTOS
 (@POSICION INT)
 AS
@@ -52,6 +54,38 @@ AS
 		WHERE QUERY.POSICION >= @POSICION AND 
 		QUERY.POSICION < (@POSICION +2)
 GO
+
+
+CREATE PROCEDURE SP_GRUPO_EMP_DEPT
+(@POSICION INT, 
+@DEPT INT,
+@REGISTROS INT OUT)
+AS
+	SELECT @REGISTROS = COUNT(EMP_NO) FROM EMP
+	WHERE DEPT_NO = @DEPT
+	SELECT EMP_NO, APELLIDO, OFICIO, SALARIO, DEPT_NO FROM (
+		SELECT CAST(
+		ROW_NUMBER() OVER (ORDER BY APELLIDO) AS INT) AS POSICION
+		,EMP_NO, APELLIDO, OFICIO,SALARIO, DEPT_NO
+		FROM EMP WHERE  DEPT_NO = @DEPT) AS QUERY
+		WHERE QUERY.POSICION >= @POSICION AND 
+		QUERY.POSICION < (@POSICION +2)
+GO
+
+create procedure SP_REGISTRO_EMPLEADO_DEPARTAMENTO
+(@posicion int, @departamento int
+, @registros int out)
+as
+select @registros = count(EMP_NO) from EMP
+where DEPT_NO=@departamento
+select EMP_NO, APELLIDO, OFICIO, SALARIO, DEPT_NO from 
+    (select cast(
+    ROW_NUMBER() OVER (ORDER BY APELLIDO) as int) AS POSICION
+    , EMP_NO, APELLIDO, OFICIO, SALARIO, DEPT_NO
+    from EMP
+    where DEPT_NO=@departamento) as QUERY
+    where QUERY.POSICION = @posicion
+go
  */
 namespace MvcCorePaginacionRegistros.Repositories
 {
@@ -92,6 +126,32 @@ namespace MvcCorePaginacionRegistros.Repositories
         }
 
 
+        public async Task<ModelDeptEmp>
+            GetEmpleadoDepartamentoAsync
+            (int posicion, int iddepartamento)
+        {
+            string sql = "SP_REGISTRO_EMPLEADO_DEPARTAMENTO @posicion, @departamento, "
+                + " @registros out";
+            SqlParameter pamPosicion = new SqlParameter("@posicion", posicion);
+            SqlParameter pamDepartamento =
+                new SqlParameter("@departamento", iddepartamento);
+            SqlParameter pamRegistros = new SqlParameter("@registros", -1);
+            pamRegistros.Direction = ParameterDirection.Output;
+            var consulta =
+                this.context.Empleados.FromSqlRaw
+                (sql, pamPosicion, pamDepartamento, pamRegistros);
+            //PRIMERO DEBEMOS EJECUTAR LA CONSULTA PARA PODER RECUPERAR 
+            //LOS PARAMETROS DE SALIDA
+            var datos = await consulta.ToListAsync();
+            Empleado empleado = datos.FirstOrDefault();
+
+            int registros = (int)pamRegistros.Value;
+            return new ModelDeptEmp
+            {
+                NumRegistros = registros,
+                Empleado = empleado
+            };
+        }
 
 
         //METODO PARA SABER EL NUMERO DE EMPLEADOS POR OFICIO
@@ -158,6 +218,16 @@ namespace MvcCorePaginacionRegistros.Repositories
             return vista;
         }
 
+        public async Task<VistaEmpleado>
+            GetVistaEmpleado(int posicion)
+        {
+            VistaEmpleado vista = await
+                this.context.VistaEmpleados
+                .Where(z => z.Posicion == posicion)
+                .FirstOrDefaultAsync();
+            return vista;
+        }
+
 
         public async Task<List<VistaDepartamento>>
             GetGrupoVistaDepartamentoAsync(int posicion)
@@ -192,5 +262,27 @@ namespace MvcCorePaginacionRegistros.Repositories
             }
         }
 
+
+        public async Task<List<Departamento>> GetDepartamentos()
+        {
+            var consulta = from datos in context.Departamentos
+                           select datos;
+            return await consulta.ToListAsync();    
+        }
+
+        public async Task<Departamento> FindDepto(int id)
+        {
+            var consulta = from datos in context.Departamentos
+                           where datos.IdDepartamento == id
+                           select datos;
+            return await consulta.FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Empleado>> GetEmpleados()
+        {
+            var consulta = from datos in context.Empleados
+                           select datos;
+            return await consulta.ToListAsync();
+        }
     }
 }

@@ -173,5 +173,40 @@ namespace MvcCorePaginacionRegistros.Controllers
 
             return View(vista);
         }
+
+        public async Task<IActionResult>
+            PaginarRegistroVistaEmpleado(int? posicion)
+        {
+            if (posicion == null)
+            {
+                //ponemos la posicion en el primer registro
+                posicion = 1;
+            }
+
+            int numeroRegistros = await
+                this.repo.GetNumeroRegistrosVistaEmpleados();
+            int siguiente = posicion.Value + 1;
+
+            if (siguiente > numeroRegistros)
+            {
+                //efecto optico 
+                siguiente = numeroRegistros;
+            }
+            int anterior = posicion.Value - 1;
+
+            if (anterior < 1)
+            {
+                anterior = 1;
+            }
+
+            VistaEmpleado vista = await
+                this.repo.GetVistaEmpleado(posicion.Value);
+
+            ViewData["ULTIMO"] = numeroRegistros;
+            ViewData["SIGUIENTE"] = siguiente;
+            ViewData["ANTERIOR"] = anterior; ;
+
+            return View(vista);
+        }
     }
 }
