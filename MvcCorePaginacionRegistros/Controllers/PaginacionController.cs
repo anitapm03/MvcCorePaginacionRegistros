@@ -13,6 +13,74 @@ namespace MvcCorePaginacionRegistros.Controllers
             this.repo = repo;
         }
 
+        public async Task<IActionResult> EmpleadosOficioOut
+            (int? posicion, string oficio)
+        {
+            if (posicion == null)
+            {
+                posicion = 1;
+                return View();
+            }
+            else
+            {
+                ModelPaginacionEmpleado model = await
+                    this.repo.GetGrupoEmpleadosOficioOutAsync(posicion.Value, oficio);
+                ViewData["REGISTROS"] = model.NumRegistros;
+                ViewData["OFICIO"] = oficio;
+                return View(model.Empleados);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EmpleadosOficioOut
+            (string oficio)
+        {
+            ModelPaginacionEmpleado model = await
+                this.repo.GetGrupoEmpleadosOficioOutAsync(1, oficio);
+            ViewData["REGISTROS"] = model.NumRegistros;
+            ViewData["OFICIO"] = oficio;
+            return View(model.Empleados);
+        }
+
+
+        public async Task<IActionResult> EmpleadosOficio
+            (int? posicion, string oficio)
+        {
+            if(posicion == null)
+            {
+                posicion = 1;
+                return View();
+            }
+            else
+            {
+                List<Empleado> empleados = await
+                     this.repo.GetGrupoEmpOficio(posicion.Value, oficio);
+                int numeroRegistros = await
+                this.repo.GetNumEmpOficio(oficio);
+
+                ViewData["REGISTROS"] = numeroRegistros;
+                ViewData["OFICIO"] = oficio;
+
+                return View(empleados);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> EmpleadosOficio
+            (string oficio)
+        {
+            //cuando buscamos en que posicion empieza todo?
+            List<Empleado> empleados = await
+                this.repo.GetGrupoEmpOficio(1, oficio);
+            int numeroRegistros = await
+                this.repo.GetNumEmpOficio(oficio);
+
+            ViewData["REGISTROS"] = numeroRegistros;
+            ViewData["OFICIO"] = oficio;
+
+            return View(empleados);
+        }
+
+
         public async Task<IActionResult>
            PaginarGrupoEmp(int? posicion)
         {

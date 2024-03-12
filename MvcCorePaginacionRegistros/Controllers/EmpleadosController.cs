@@ -13,10 +13,10 @@ namespace MvcCorePaginacionRegistros.Controllers
             this.repo = repo;
         }
 
-        public async Task<IActionResult> EmpleadosDepartamento(int iddepartamento)
+        public async Task<IActionResult> EmpleadosDepartamento(int idempleado)
         {
             List<Empleado> empleados =
-               await this.repo.GetEmpleadosDepartamentoAsync(iddepartamento);
+               await this.repo.GetEmpleadosDepartamentoAsync(idempleado);
             return View(empleados);
 
         }

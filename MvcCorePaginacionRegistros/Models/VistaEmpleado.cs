@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MvcCorePaginacionRegistros.Models
 {
-    [Table("EMP")]
+    [Table("V_EMP_INDIVIDUAL")]
     public class VistaEmpleado
     {
         [Key]
